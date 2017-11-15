@@ -428,35 +428,25 @@ def Setup():
     PlayerCount = GetNumberOfPlayers()
     #PlayerCount = 2        # for testing purposes
 
-    def CreatePlayer(Number):
-        inteligentPlayer = (Number == 0)
-
+    def CreateConsolePlayer(Number):
         player = ConsolePlayer()
-
-        if inteligentPlayer:
-            player = InteligentPlayer()
-
         player.name = input("Player #%i: What is your name (Leave blank for a random name)? " % (Number + 1))
-
-        if player.name.strip() == "":
-            player.name = random.choice(defaultNames)
-            defaultNames.remove(player.name)
-            print(" Player %i's name is %s\n" % (Number + 1, player.name))
-
-        if inteligentPlayer:
-            message = "Select %s's cards" % (player.name)
-            player.influence = SelectCards(message, True)
-
-            print(" Player %s is holding: %s and %s\n" % (player.name, player.influence[0].name, player.influence[1].name))
 
         return player
 
+    def CreateIntelligentPlayer(Number):
+        return InteligentPlayer()
+
     print("\n")
+    intenlligentPlayerIndex = 0 # for testing
     for i in range(PlayerCount):
-        Players.append(CreatePlayer(i))
+        if i == intenlligentPlayerIndex:
+            Players.append(CreateIntelligentPlayer(i))
+        else:
+            Players.append(CreateConsolePlayer(i))
 
     SetupRNG()
-    random.shuffle(Players)
+    # random.shuffle(Players)
 
     global PlayersAlive
     PlayersAlive = [player for player in Players if player.alive]
@@ -640,15 +630,6 @@ def MainLoop():
 def main():
     ClearScreen("Game Setup", 50)
     Setup()
-
-    for player in Players:
-        PrintTurnOrder(player)
-
-        input("\n%s, press ENTER to see your cards" % player.name)
-        padding = " " * (len(player.name) + 2)
-        heldCards = " and ".join([card.name for card in player.influence])
-        print("\n%s\n" % (padding + heldCards))
-        input("%sPress ENTER to hide your cards" % (padding))
 
     ClearScreen("Game start", 14)
     input("\n%s, press enter key to start the game..." % (Players[0].name))
